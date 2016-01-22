@@ -1,0 +1,115 @@
+## =======================================================================
+# Równanie Lotki-Volterry 
+## Model drapie¿nik-ofiara
+## =====================================================================
+```{r eval = TRUE, echo = FALSE, message = FALSE}
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+    
+    
+    
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.2,    # tempo przyswajania(pokarmu)
+           rGrow  = 1.0,    # tempo wzrostu/przyrostu zwierzyny (ofiar)
+           rMort  = 0.2 ,   # wskaŸnik œmeirtelnoœci drapie¿ników
+           assEff = 0.5,    # wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+           K      = 10)     # pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 1000, by = 1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+## Default plot method
+plot(out)
+
+## User specified plotting
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "time", ylab = "Conc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+```{r eval = TRUE}
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    #Ingestion    <- rIng  * Ofiara * Drapieznik
+    #GrowthPrey   <- rGrow * Ofiara * (1 - Ofiara/K)
+    #MortPredator <- rMort * Drapieznik
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara * assEff - rMort) * Drapieznik
+    
+    #dOfiara       <- GrowthPrey - Ingestion
+    #dDrapieznik    <- Ingestion * assEff - MortPredator
+    
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.2,    # /day, rate of ingestion
+           rGrow  = 1.0,    # /day, growth rate of prey
+           rMort  = 0.2 ,   # /day, mortality rate of predator
+           assEff = 0.5,    # -, assimilation efficiency
+           K      = 10)     # mmol/m3, carrying capacity
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "time", ylab = "Conc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+```
+## =======================================================================
+# Równanie Lotki-Volterry 
+## Model drapie¿nik-ofiara
+## =======================================================================
+
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    Ingestion    <- rIng  * Prey * Predator
+    GrowthPrey   <- rGrow * Prey * (1 - Prey/K)
+    MortPredator <- rMort * Predator
+    
+    dPrey        <- GrowthPrey - Ingestion
+    dPredator    <- Ingestion * assEff - MortPredator
+    
+    return(list(c(dPrey, dPredator)))
+  })
+}
+
+pars  <- c(rIng   = 0.2,    # /day, rate of ingestion
+           rGrow  = 1.0,    # /day, growth rate of prey
+           rMort  = 0.2 ,   # /day, mortality rate of predator
+           assEff = 0.5,    # -, assimilation efficiency
+           K      = 10)     # mmol/m3, carrying capacity
+
+yini  <- c(Prey = 1, Predator = 2)
+times <- seq(0, 200, by = 1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+## Default plot method
+plot(out)
+
+## User specified plotting
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "time", ylab = "Conc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("prey", "predator"), col = 1:2, lty = 1:2)
+
+```
