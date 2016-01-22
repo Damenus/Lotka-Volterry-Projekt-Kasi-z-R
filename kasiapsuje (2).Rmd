@@ -1,0 +1,266 @@
+## =====================================================
+# Równanie Lotki-Volterry 
+## Model drapie¿nik-ofiara
+## =====================================================
+
+### Jest to nieliniowy uk³ad równañ ró¿niczkowych pierwszego stopnia zaproponowany w 1926 przez Vito Volterrê do opisu populacji ryb od³awianych w Morzu Adriatyckim. Niezale¿nie od Volterry równowa¿ne równania do opisu oscylacji stê¿eñ substancji w hipotetycznej reakcji chemicznej otrzyma³ Alfred James Lotka w 1920 roku.
+
+###Równanie Lotki-Voltery stanowi model uk³adów dynamicznych wystêpuj¹cych w ekosystemach (np. w symulacji zachowania populacji ofiar i drapie¿ników).
+
+#1.
+##Rozwi¹zanie dla pierwszych parametrów
+####od 1 do 1000 z krokiem 1
+
+
+```{r eval = TRUE,  message = FALSE}
+library(deSolve) #za³¹cza bliblioteke ode
+vollot <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+    
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+    
+    
+    
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+#parametry
+pars  <- c(rIng   = 0.2,    # tempo przyswajania(pokarmu)
+           rGrow  = 1.0,    # tempo wzrostu/przyrostu zwierzyny (ofiar)
+           rMort  = 0.2 ,   # wskaŸnik œmeirtelnoœci drapie¿ników
+           assEff = 0.5,    # wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+           K      = 10)     # pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+
+yini  <- c(Ofiara = 1, Drapieznik = 2) #stan poczatkowy
+times <- seq(0, 1000, by = 1)
+out   <- ode(yini, times, vollot, pars)
+summary(out) #tabelka-zestawienie wartoœci minmalnych, maksymalnych mediany itd.
+
+## Rysowanie Wykresu
+plot(out)
+
+## specyfikacje, legenda, dwa wykresy na jednym
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+out #przyk³adowa macierz zagadnienia
+```
+
+
+##-----
+#2.
+##Powtóreczka dla tych samych danych
+#### od 1 do 100 z krokiem 0.1
+##-----
+
+```{r eval = TRUE}  
+#informacja, ¿e to jest kod w R :) 
+
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+   
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+  
+    
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.2,    
+           rGrow  = 1.0,    
+           rMort  = 0.2 ,   
+           assEff = 0.5,   
+           K      = 10)     
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+##-----------------------------------------------------
+#3.
+##Dla danych:
+### 0.8   tempo przyswajania(pokarmu)
+### 2.0   tempo wzrostu/przyrostu zwierzyny (ofiar)
+### 0.4   wskaŸnik œmeirtelnoœci drapie¿ników
+### 0.8   wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+### 100   pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+##-----------------------------------------------------
+
+```{r eval = TRUE, echo = FALSE} 
+#informacja, ¿e to jest kod w R :) 
+#powtóreczka dla innych danych
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+   
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+    
+  
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.8,    
+           rGrow  = 2.0,    
+           rMort  = 0.4 ,   
+           assEff = 0.8,    
+           K      = 100)     
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+##-----------------------------------------------------
+#4.
+##Dla danych:
+### 0.8   tempo przyswajania(pokarmu)
+### 2.0   tempo wzrostu/przyrostu zwierzyny (ofiar)
+### 0.4   wskaŸnik œmeirtelnoœci drapie¿ników
+### 0.8   wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+### 100   pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+##-----------------------------------------------------
+
+```{r eval = TRUE, echo = FALSE} 
+#informacja, ¿e to jest kod w R :) 
+#powtóreczka dla innych danych
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+   
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+  
+    
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.2,    
+           rGrow  = 1.0,    
+           rMort  = 0.2 ,   
+           assEff = 0.5,   
+           K      = 10)     
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+##-----------------------------------------------------
+#5.
+##Dla danych:
+### 0.8   tempo przyswajania(pokarmu)
+### 2.0   tempo wzrostu/przyrostu zwierzyny (ofiar)
+### 0.4   wskaŸnik œmeirtelnoœci drapie¿ników
+### 0.8   wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+### 100   pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+##-----------------------------------------------------
+
+```{r eval = TRUE, echo = FALSE} 
+#informacja, ¿e to jest kod w R :) 
+#powtóreczka dla innych danych
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+   
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+    
+  
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.8,    
+           rGrow  = 10.0,    
+           rMort  = 1.2 ,   
+           assEff = 1.0,    
+           K      = 100)     
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
+
+##-----------------------------------------------------
+#6.
+##Dla danych:
+### 0.8   tempo przyswajania(pokarmu)
+### 2.0   tempo wzrostu/przyrostu zwierzyny (ofiar)
+### 0.4   wskaŸnik œmeirtelnoœci drapie¿ników
+### 0.8   wydajnoœæ przyswajania (czêœæ pokarmu faktycznie przetwarzana przez organizm na energie)
+### 100   pojemnoœæ œrodowiska (maksymalna populacja jak¹ mog¹ utrzymaæ zasoby danego ekosystemu)
+##-----------------------------------------------------
+
+```{r eval = TRUE, echo = FALSE} 
+#informacja, ¿e to jest kod w R :) 
+#powtóreczka dla innych danych
+library(deSolve)
+LVmod <- function(Time, State, Pars) {
+  with(as.list(c(State, Pars)), {
+   
+    
+    dOfiara        <-  (rGrow * (1 - Ofiara/K) - rIng  * Drapieznik) * Ofiara
+    dDrapieznik    <-  (rIng  * Ofiara *  assEff - rMort) * Drapieznik
+    
+  
+    return(list(c(dOfiara, dDrapieznik)))
+   })
+}
+
+pars  <- c(rIng   = 0.1,    
+           rGrow  = 2.0,    
+           rMort  = 4.4 ,   
+           assEff = 8.0,    
+           K      = 100)     
+
+yini  <- c(Ofiara = 1, Drapieznik = 2)
+times <- seq(0, 100, by = 0.1)
+out   <- ode(yini, times, LVmod, pars)
+summary(out)
+
+plot(out)
+
+matplot(out[ , 1], out[ , 2:3], type = "l", xlab = "Czas", ylab = "Liczebnosc",
+        main = "Lotka-Volterra", lwd = 2)
+legend("topright", c("Ofiara", "Drapieznik"), col = 1:2, lty = 1:2)
+```
